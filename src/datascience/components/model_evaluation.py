@@ -6,15 +6,12 @@ import mlflow
 import mlflow.sklearn
 import numpy as np
 import joblib
+from dotenv import load_dotenv
 from src.datascience.constants import *
 from src.datascience.utils.common import save_json
 from src.datascience.entity.config_entity import ModelEvaluationConfig
 
-import os
-
-os.environ["MLFLOW_TRACKING_URI"]="https://dagshub.com/fakhrulfaiz/wine_quality_pipeline.mlflow"
-os.environ["MLFLOW_TRACKING_USERNAME"]="fakhrulfaiz"
-os.environ["MLFLOW_TRACKING_PASSWORD"]="2a1981e74d26d153a17ea7d7f50b8e8e6dba14d7"
+load_dotenv()
 
 class ModelEvaluation:
     def __init__(self, config: ModelEvaluationConfig):
