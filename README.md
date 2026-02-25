@@ -1,28 +1,59 @@
-# End-to-End Data Science Project
+# Wine Quality Prediction — MLOps Pipeline
 
-This repository contains a production-ready, modular Machine Learning project.
+End-to-end ML pipeline for predicting red wine quality scores, built with a modular MLOps architecture.
 
-## 🏗️ ML Pipeline Architecture
+## Stack
 
-The automated pipeline follows these sequential stages:
+- **Preprocessing** — scikit-learn `Pipeline` + `StandardScaler`
+- **Model** — ElasticNet (scikit-learn)
+- **Experiment Tracking** — MLflow + DagsHub
+- **Pipeline Orchestration** — DVC
+- **Serving** — Flask
 
-1. **Data Ingestion:** Fetching data from the source (databases, APIs, or local storage).
-2. **Data Validation:** Checking data quality, schema, and identifying anomalies.
-3. **Data Transformation:** Feature engineering, scaling, and data preprocessing.
-4. **Model Trainer:** Training the machine learning algorithm.
-5. **Model Evaluation:** Tracking metrics, experimenting, and registering models using **MLflow** and **DagsHub**.
-6. **Deployment:** Serving the model via an API or Web Application (Flask/FastAPI).
+## Pipeline Stages
 
-## 🛠️ Development Workflow
+| Stage | Component | Output Artifact |
+|---|---|---|
+| Data Ingestion | `data_ingestion.py` | `artifacts/data_ingestion/winequality-red.csv` |
+| Data Validation | `data_validation.py` | `artifacts/data_validation/status.txt` |
+| Data Transformation | `data_transformation.py` | `train.csv`, `test.csv`, `preprocessor.joblib` |
+| Model Training | `model_trainer.py` | `artifacts/model_trainer/model.joblib` |
+| Model Evaluation | `model_evaluation.py` | `metrics.json` + MLflow run on DagsHub |
 
-When building a new component or adding a feature, follow these exact steps to maintain the modular architecture:
+## Quickstart
 
-1. Update `config/config.yaml` (Define file paths and directory structures)
-2. Update `schema.yaml` (Define data columns and data types)
-3. Update `params.yaml` (Define model hyperparameters)
-4. Update the **Entity** (`src/project_name/entity/config_entity.py` - Define data classes for the configs)
-5. Update the **Configuration Manager** (`src/project_name/config/configuration.py` - Read the yaml files)
-6. Update the **Components** (`src/project_name/components/` - Write the actual processing/training logic)
-7. Update the **Pipeline** (`src/project_name/pipeline/` - Chain the components together)
-8. Update `main.py` (Trigger the pipeline execution)
-9. Update `app.py` (Integrate the pipeline with the web interface/API)
+```bash
+pip install -r requirements.txt
+
+# Run full pipeline
+python main.py
+
+# Start web app
+python app.py
+```
+
+## Development Workflow
+
+When adding a new feature or stage, update in this order:
+
+1. `config/config.yaml` — file paths and directories
+2. `schema.yaml` — column names and types
+3. `params.yaml` — model hyperparameters
+4. `entity/config_entity.py` — dataclass for the new config
+5. `config/configuration.py` — read and return the new config
+6. `components/` — processing or training logic
+7. `pipeline/` — wire the component into a pipeline stage
+8. `main.py` — add the stage to the full run
+9. `app.py` — expose via the web interface if needed
+
+## MLflow & DagsHub
+
+Metrics and model artifacts (including `preprocessor.joblib`) are logged to DagsHub on every evaluation run.
+
+```
+https://dagshub.com/fakhrulfaiz/wine_quality_pipeline
+```
+
+## DVC
+
+See [`docs/dvc_guide.md`](docs/dvc_guide.md) for setup and usage with DagsHub remote storage.
