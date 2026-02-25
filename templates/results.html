@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction Result · Wine Quality ML</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0f1117;
+      --surface: #1a1d27;
+      --border:  #2a2d3a;
+      --accent:  #4f6ef7;
+      --text:    #e8eaf0;
+      --muted:   #8b8fa8;
+      --success: #4caf7d;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .45rem 1.1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .18s;
+    }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-sm { padding: .35rem .85rem; font-size: .8rem; }
+
+    .page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+
+    .result-top {
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .result-icon {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(79,110,247,.1);
+      border: 1px solid rgba(79,110,247,.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.25rem;
+    }
+
+    .result-label {
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: .5rem;
+    }
+
+    .result-score {
+      font-size: 4rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.04em;
+      color: var(--text);
+      margin-bottom: .4rem;
+    }
+
+    .result-subtitle {
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    /* Quality bar */
+    .quality-bar-wrap {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .quality-bar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--muted);
+      margin-bottom: .6rem;
+    }
+    .quality-bar-track {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .quality-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: var(--accent);
+      transition: width .6s ease;
+    }
+
+    /* Meta */
+    .result-meta {
+      padding: 1.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+    }
+    .meta-row .label { color: var(--muted); }
+    .meta-row .value { font-weight: 500; }
+
+    .result-actions {
+      padding: 1.25rem 2rem 2rem;
+      display: flex;
+      gap: .75rem;
+    }
+    .result-actions .btn { flex: 1; justify-content: center; }
+
+    @media (max-width: 520px) {
+      .result-score { font-size: 3rem; }
+      .result-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/>
+    </svg>
+    Wine Quality ML
+  </div>
+  <a href="/" class="btn btn-outline btn-sm">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+    </svg>
+    Back
+  </a>
+</nav>
+
+<div class="page">
+  <div class="result-card">
+
+    <div class="result-top">
+      <div class="result-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div class="result-label">Predicted Quality Score</div>
+      <div class="result-score" id="scoreDisplay">—</div>
+      <div class="result-subtitle">out of 10 · Wine Quality UCI model</div>
+    </div>
+
+    <div class="quality-bar-wrap">
+      <div class="quality-bar-header">
+        <span>0 — Poor</span>
+        <span>10 — Excellent</span>
+      </div>
+      <div class="quality-bar-track">
+        <div class="quality-bar-fill" id="qualityBar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="result-meta">
+      <div class="meta-row">
+        <span class="label">Model</span>
+        <span class="value">ElasticNet Regression</span>
+      </div>
+      <div class="meta-row">
+        <span class="label">Pipeline</span>
+        <span class="value">scikit-learn · MLflow</span>
+      </div>
+      <div class="meta-row">
+        <span class="label">Interpretation</span>
+        <span class="value" id="interpretation">—</span>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <a href="/" class="btn btn-primary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        New Prediction
+      </a>
+      <a href="/train" class="btn btn-outline">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Retrain
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Flask passes prediction as a template variable
+  const raw = "{{ prediction }}";
+
+  // Parse the numeric value from various formats e.g. "[5.23]" or "5.23"
+  const match = raw.match(/-?\d+(\.\d+)?/);
+  const score = match ? parseFloat(match[0]) : null;
+
+  if (score !== null) {
+    const display = document.getElementById('scoreDisplay');
+    const bar     = document.getElementById('qualityBar');
+    const interp  = document.getElementById('interpretation');
+
+    display.textContent = score.toFixed(2);
+    bar.style.width = Math.min(Math.max(score / 10 * 100, 0), 100) + '%';
+
+    let label;
+    if      (score >= 8)  label = 'Excellent';
+    else if (score >= 6.5) label = 'Good';
+    else if (score >= 5)  label = 'Average';
+    else if (score >= 3)  label = 'Below average';
+    else                  label = 'Poor';
+    interp.textContent = label;
+  }
+</script>
+</body>
+</html>

@@ -45,9 +45,14 @@ class ConfigurationManager:
 
         create_directories([config.root_dir])
 
+        target_column = self.schema.TARGET_COLUMN.name
+        feature_columns = [col for col in self.schema.COLUMNS if col != target_column]
+
         data_transformation_config = DataTransformationConfig(
             root_dir=config.root_dir,
             data_path=config.data_path,
+            preprocessor_path=Path(config.preprocessor_path),
+            feature_columns=feature_columns,
         )
 
         return data_transformation_config
